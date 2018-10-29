@@ -13,7 +13,7 @@ import NotAnAddreth from '../components/NotAnAddreth'
 import Button from '../components/Button'
 import { Subscribe } from 'laco-react'
 
-import { Web3Store, initMetaMask } from '../stores/web3'
+import { Web3Store, initMetaMask, ensLookup } from '../stores/web3'
 
 const Container = styled.div`
   max-width: 100vw;
@@ -122,6 +122,8 @@ export default class Addreth extends Component {
     editMode: false,
     claimed: false,
     dataLoaded: false,
+    address: '',
+    ensDomain: '',
   }
 
   static async getInitialProps({ query }) {
@@ -154,11 +156,23 @@ export default class Addreth extends Component {
     abiDecoder.addABI(this.abi)
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const { addreth } = this.props
+    const { web3 } = Web3Store.get()
+
     initMetaMask()
-    this.findAddress(this.props.addreth)
-    this.ensureEthAddress(this.props.addreth)
-    this.validateAddreth(this.props.addreth)
+
+    if (web3.utils.isAddress(addreth)) {
+      this.findAddress(addreth)
+      this.setState({ address: addreth })
+    }
+
+    const address = await ensLookup(addreth)
+
+    if (address) {
+      this.findAddress(address)
+      this.setState({ address, ensDomain: addreth })
+    }
   }
 
   validateENSDomain(addreth) {
@@ -282,7 +296,7 @@ export default class Addreth extends Component {
   async probeEnsDomain(addreth) {
     if (this.validateENSDomain(addreth)) {
       try {
-        await Utils.resolveEnsDomain(addreth)
+        await ensLookup(addreth)
         return true
       } catch (e) {
         console.error(e)
@@ -301,7 +315,7 @@ export default class Addreth extends Component {
   async ensureEthAddress(addreth) {
     if (this.validateENSDomain(addreth)) {
       try {
-        let address = await Utils.resolveEnsDomain(addreth)
+        let address = await ensLookup(addreth)
         Router.push(`/addreth/${address}`)
       } catch (e) {
         console.error(e)
@@ -320,16 +334,16 @@ export default class Addreth extends Component {
           <div>
             <AddrethLink
               href={`https://blockscout.com/eth/mainnet/address/${
-                this.props.addreth
+                this.state.address
               }`}
               target="_blank"
             >
-              {this.props.addreth}
+              {this.state.address}
             </AddrethLink>
           </div>
-          <DonationForm address={this.props.addreth} donationNetworkID={3} />
+          <DonationForm address={this.state.address} donationNetworkID={3} />
           <LeaderboardContainer>
-            <Leaderboard address={this.props.addreth} />
+            <Leaderboard address={this.state.address} />
           </LeaderboardContainer>
         </Container>
       )
@@ -337,7 +351,7 @@ export default class Addreth extends Component {
   }
 
   render() {
-    const { addreth } = this.props
+    const { address } = this.state
     const {
       titleValue,
       descriptionValue,
@@ -345,23 +359,24 @@ export default class Addreth extends Component {
       ipfsPayload,
       claimed,
       dataLoaded,
+      ensDomain,
     } = this.state
 
     return (
       <Subscribe to={[Web3Store]}>
         {({ account }) => {
-          const isOwner = account === addreth.toLowerCase()
+          const isOwner = account === address.toLowerCase()
           return (
             <div>
               <Navbar asd="ads">
                 <Link route="/">
                   <Brand src="../static/images/brand.svg" />
                 </Link>
-                <p>{addreth}</p>
-                {this.validateENSDomain(addreth) && (
+                <p>{address}</p>
+                {ensDomain && (
                   <>
                     <Brand src="../static/images/ens.svg" />
-                    <p>{addreth}</p>
+                    <p>{ensDomain}</p>
                   </>
                 )}
                 <Button

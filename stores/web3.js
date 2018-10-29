@@ -1,4 +1,7 @@
 import Web3 from 'web3'
+import ENS from 'ethjs-ens'
+import httpProvider from 'ethjs-provider-http'
+
 import { Store } from 'laco'
 
 export const Web3Store = new Store({
@@ -6,6 +9,10 @@ export const Web3Store = new Store({
   account: '',
   isAvailable: false,
   network: 0,
+  ens: new ENS({
+    provider: new httpProvider('https://mainnet.infura.io'),
+    network: 1,
+  }),
 })
 
 export const initMetaMask = () => {
@@ -73,4 +80,9 @@ export const initMetaMask = () => {
       )
     }
   })
+}
+
+export const ensLookup = async domain => {
+  const { ens } = Web3Store.get()
+  return await ens.lookup(domain)
 }

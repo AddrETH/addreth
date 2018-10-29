@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import Web3 from 'web3'
 import IPFS from 'ipfs-mini'
 import parse from 'domain-name-parser'
 import axios from 'axios'
@@ -124,6 +123,7 @@ export default class Addreth extends Component {
     dataLoaded: false,
     address: '',
     ensDomain: '',
+    error: false,
   }
 
   static async getInitialProps({ query }) {
@@ -166,11 +166,12 @@ export default class Addreth extends Component {
       this.findAddress(addreth)
       this.setState({ address: addreth })
     } else {
-      const address = await ensLookup(addreth)
-
-      if (address) {
+      try {
+        const address = await ensLookup(addreth)
         this.findAddress(address)
         this.setState({ address, ensDomain: addreth })
+      } catch (error) {
+        this.setState({ error: true })
       }
     }
   }
@@ -293,57 +294,26 @@ export default class Addreth extends Component {
       })
   }
 
-  async probeEnsDomain(addreth) {
-    if (this.validateENSDomain(addreth)) {
-      try {
-        await ensLookup(addreth)
-        return true
-      } catch (e) {
-        console.error(e)
-        return false
-      }
-    }
-  }
-
-  async validateAddreth(addreth) {
-    const web3 = new Web3()
-    const isValid =
-      web3.utils.isAddress(addreth) || (await this.probeEnsDomain(addreth))
-    this.setState({ isAddrethValid: isValid, isAddrethValidated: true })
-  }
-
-  async ensureEthAddress(addreth) {
-    if (this.validateENSDomain(addreth)) {
-      try {
-        let address = await ensLookup(addreth)
-        Router.push(`/addreth/${address}`)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
   renderBody(dataLoaded) {
-    if (!dataLoaded) {
+    const { error, address } = this.state
+    if (!dataLoaded && !error) {
       return <div>Back in the tube and staining...</div>
-    } else if (!this.state.isAddrethValid) {
+    } else if (error) {
       return <NotAnAddreth />
     } else {
       return (
         <Container>
           <div>
             <AddrethLink
-              href={`https://blockscout.com/eth/mainnet/address/${
-                this.state.address
-              }`}
+              href={`https://blockscout.com/eth/mainnet/address/${address}`}
               target="_blank"
             >
-              {this.state.address}
+              {address}
             </AddrethLink>
           </div>
-          <DonationForm address={this.state.address} donationNetworkID={3} />
+          <DonationForm address={address} donationNetworkID={3} />
           <LeaderboardContainer>
-            <Leaderboard address={this.state.address} />
+            <Leaderboard address={address} />
           </LeaderboardContainer>
         </Container>
       )
@@ -368,7 +338,7 @@ export default class Addreth extends Component {
           const isOwner = account === address.toLowerCase()
           return (
             <div>
-              <Navbar asd="ads">
+              <Navbar>
                 <Link route="/">
                   <Brand src="../static/images/brand.svg" />
                 </Link>

@@ -30,7 +30,7 @@ export const initMetaMask = () => {
           Web3Store.set(() => ({
             web3,
             isAvailable: true,
-            account: accounts[0],
+            account: accounts[0].toLowerCase(),
           }))
         } else {
           alert("You've locked your MetaMask")
@@ -59,7 +59,7 @@ export const initMetaMask = () => {
         Web3Store.set(() => ({
           web3,
           isAvailable: true,
-          account: accounts[0],
+          account: accounts[0].toLowerCase(),
         }))
       } else {
         alert("You've locked your MetaMask")

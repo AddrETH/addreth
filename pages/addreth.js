@@ -165,13 +165,13 @@ export default class Addreth extends Component {
     if (web3.utils.isAddress(addreth)) {
       this.findAddress(addreth)
       this.setState({ address: addreth })
-    }
+    } else {
+      const address = await ensLookup(addreth)
 
-    const address = await ensLookup(addreth)
-
-    if (address) {
-      this.findAddress(address)
-      this.setState({ address, ensDomain: addreth })
+      if (address) {
+        this.findAddress(address)
+        this.setState({ address, ensDomain: addreth })
+      }
     }
   }
 

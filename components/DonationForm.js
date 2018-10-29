@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import Web3 from 'web3'
+import QRCode from 'qrcode.react'
 import styled from 'styled-components'
 
 import Button from '../components/Button'
@@ -167,6 +168,7 @@ export default class DonationForm extends PureComponent {
         {/* <img src="/img/ways-to-donate.svg" className="typelogo img-fluid" /> */}
         {candonate ? (
           <TransactionContainer>
+            <QRCode value={this.props.address} />
             <TransactionForm onSubmit={this.handleDonate}>
               <Input type="text" placeholder="ETH to send" name="amount" />
               <Input type="text" placeholder="message" name="message" />

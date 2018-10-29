@@ -5,13 +5,15 @@ import IPFS from 'ipfs-mini'
 import parse from 'domain-name-parser'
 import axios from 'axios'
 import abiDecoder from 'abi-decoder'
-import { Router, Link } from '../routes'
 
+import { Router, Link } from '../routes'
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
 import Utils from '../utils'
 import Button from '../components/Button'
+
+import { Web3Store } from '../stores/web3'
 
 const Container = styled.div`
   max-width: 100vw;
@@ -111,8 +113,6 @@ const Input = styled.input`
 
 export default class Addreth extends Component {
   state = {
-    metamaskAvailable: false,
-    account: null,
     editTitle: false,
     titleValue: '',
     editDescription: false,
@@ -155,7 +155,6 @@ export default class Addreth extends Component {
   }
 
   componentDidMount() {
-    this.initMetaMask()
     this.findAddress(this.props.addreth)
     this.ensureEthAddress(this.props.addreth)
     this.validateAddreth(this.props.addreth)
@@ -164,71 +163,6 @@ export default class Addreth extends Component {
   validateENSDomain(addreth) {
     const domain = parse(addreth)
     return domain.tld == 'eth'
-  }
-
-  initMetaMask = () => {
-    /*eslint-disable no-undef*/
-    window.addEventListener('load', async () => {
-      // Modern dapp browsers...
-      if (window.ethereum) {
-        window.web3 = new Web3(ethereum)
-        this.web3 = window.web3
-        try {
-          // Request account access if needed
-          await ethereum.enable()
-          // Acccounts now exposed
-          web3.eth.getAccounts().then(a => {
-            this.setState({
-              metamaskAvailable: true,
-              account: a[0].toLowerCase(),
-            })
-          })
-
-          web3.currentProvider.publicConfigStore.on('update', res => {
-            console.log('web3 updated..', res)
-            this.setState({
-              metamaskAvailable: true,
-              account: res.selectedAddress.toLowerCase(),
-            })
-          })
-        } catch (error) {
-          this.setState({
-            metamaskAvailable: false,
-          })
-          // User denied account access...
-        }
-      }
-      // Legacy dapp browsers...
-      else if (window.web3) {
-        window.web3 = new Web3(web3.currentProvider)
-        this.web3 = window.web3
-
-        // Acccounts always exposed
-        web3.eth.getAccounts().then(a => {
-          console.log(a)
-          this.setState({
-            metamaskAvailable: true,
-            account: a[0].toLowerCase(),
-          })
-        })
-
-        web3.currentProvider.publicConfigStore.on('update', res => {
-          console.log('web3 updated..', res)
-          this.setState({
-            metamaskAvailable: true,
-            account: res.selectedAddress.toLowerCase(),
-          })
-        })
-      }
-      // Non-dapp browsers...
-      else {
-        console.log(
-          'Non-Ethereum browser detected. You should consider trying MetaMask!'
-        )
-        this.setState({ metamaskAvailable: false })
-      }
-    })
-    /*eslint-enable no-undef*/
   }
 
   handleTitle = e => {
@@ -249,6 +183,7 @@ export default class Addreth extends Component {
 
   // save data on IPFS & send transaction immediately
   saveData = () => {
+    const { web3 } = Web3Store.get()
     this.setState({
       editMode: false,
       claimed: true,
@@ -257,7 +192,7 @@ export default class Addreth extends Component {
       const msgParams = this.makeData()
       this.ipfs.addJSON({ payload: msgParams }, (err, result) => {
         resolve(result)
-        const myContract = new this.web3.eth.Contract(
+        const myContract = new web3.eth.Contract(
           this.abi,
           '0xf7d934776da4d1734f36d86002de36954d7dd528',
           {
@@ -331,7 +266,7 @@ export default class Addreth extends Component {
                 acc[cur.name] = cur.value
                 return acc
               }, {})
-              this.setState({ dataloaded:true, ipfsPayload: arrayToObject })
+              this.setState({ dataloaded: true, ipfsPayload: arrayToObject })
             }
           })
         }
@@ -400,14 +335,14 @@ export default class Addreth extends Component {
   render() {
     const { addreth } = this.props
     const {
-      account,
       titleValue,
       descriptionValue,
       editMode,
       ipfsPayload,
       claimed,
-      dataloaded,
     } = this.state
+
+    const { account } = Web3Store.get()
 
     const isOwner = account === addreth.toLowerCase()
 
@@ -424,12 +359,15 @@ export default class Addreth extends Component {
               <p>{addreth}</p>
             </>
           )}
-          <Button light onClick={async () => {
+          <Button
+            light
+            onClick={async () => {
               try {
                 const address = await Utils.getMyAddress()
                 Router.push(`/address/${address}`)
               } catch (e) {}
-            }}>
+            }}
+          >
             Go to my addreth
           </Button>
         </Navbar>

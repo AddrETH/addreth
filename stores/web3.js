@@ -19,12 +19,14 @@ export const initMetaMask = () => {
         // Acccounts now exposed
         const accounts = await web3.eth.getAccounts()
 
-        if (accounts[0]) {
+        if (accounts.length) {
           Web3Store.set(() => ({
             web3,
             isAvailable: true,
             account: accounts[0],
           }))
+        } else {
+          alert("You've locked your MetaMask")
         }
 
         web3.currentProvider.publicConfigStore.on('update', res => {
@@ -46,12 +48,14 @@ export const initMetaMask = () => {
       // Acccounts always exposed
       const accounts = await web3.eth.getAccounts()
 
-      if (accounts[0]) {
+      if (accounts.length) {
         Web3Store.set(() => ({
           web3,
           isAvailable: true,
           account: accounts[0],
         }))
+      } else {
+        alert("You've locked your MetaMask")
       }
 
       web3.currentProvider.publicConfigStore.on('update', res => {

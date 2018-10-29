@@ -10,10 +10,9 @@ import { Router, Link } from '../routes'
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
-import Utils from '../utils'
 import Button from '../components/Button'
 
-import { Web3Store } from '../stores/web3'
+import { Web3Store, initMetaMask } from '../stores/web3'
 
 const Container = styled.div`
   max-width: 100vw;
@@ -155,6 +154,7 @@ export default class Addreth extends Component {
   }
 
   componentDidMount() {
+    initMetaMask()
     this.findAddress(this.props.addreth)
     this.ensureEthAddress(this.props.addreth)
     this.validateAddreth(this.props.addreth)
@@ -183,7 +183,7 @@ export default class Addreth extends Component {
 
   // save data on IPFS & send transaction immediately
   saveData = () => {
-    const { web3 } = Web3Store.get()
+    const { web3, account } = Web3Store.get()
     this.setState({
       editMode: false,
       claimed: true,
@@ -196,7 +196,7 @@ export default class Addreth extends Component {
           this.abi,
           '0xf7d934776da4d1734f36d86002de36954d7dd528',
           {
-            from: this.state.account,
+            from: account,
           }
         )
         myContract.methods.saveEth(result).send((err, tx) => {
@@ -307,22 +307,24 @@ export default class Addreth extends Component {
     }
   }
 
-  renderBody() {
-    if (!this.state.isAddrethValidated) {
+  renderBody(ipfsPayload) {
+    if (!ipfsPayload) {
       return <div>Back in the tube and staining...</div>
     } else if (!this.state.isAddrethValid) {
       return <NotAnAddreth />
     } else {
       return (
         <Container>
-          <AddrethLink
-            href={`https://blockscout.com/eth/mainnet/address/${
-              this.props.addreth
-            }`}
-            target="_blank"
-          >
-            {this.props.addreth}
-          </AddrethLink>
+          <div>
+            <AddrethLink
+              href={`https://blockscout.com/eth/mainnet/address/${
+                this.props.addreth
+              }`}
+              target="_blank"
+            >
+              {this.props.addreth}
+            </AddrethLink>
+          </div>
           <DonationForm address={this.props.addreth} donationNetworkID={3} />
           <LeaderboardContainer>
             <Leaderboard address={this.props.addreth} />
@@ -343,7 +345,6 @@ export default class Addreth extends Component {
     } = this.state
 
     const { account } = Web3Store.get()
-
     const isOwner = account === addreth.toLowerCase()
 
     return (
@@ -361,11 +362,8 @@ export default class Addreth extends Component {
           )}
           <Button
             light
-            onClick={async () => {
-              try {
-                const address = await Utils.getMyAddress()
-                Router.push(`/address/${address}`)
-              } catch (e) {}
+            onClick={() => {
+              Router.push(`/address/${account}`)
             }}
           >
             Go to my addreth
@@ -416,7 +414,7 @@ export default class Addreth extends Component {
                 )}
             </ContentWrapper>
           </div>
-          {this.renderBody()}
+          {this.renderBody(ipfsPayload)}
         </Container>
       </div>
     )

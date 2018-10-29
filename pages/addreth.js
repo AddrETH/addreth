@@ -11,6 +11,7 @@ import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
 import Button from '../components/Button'
+import { Subscribe } from 'laco-react'
 
 import { Web3Store, initMetaMask } from '../stores/web3'
 
@@ -120,7 +121,7 @@ export default class Addreth extends Component {
     isAddrethValidated: false,
     editMode: false,
     claimed: false,
-    dataloaded: false,
+    dataLoaded: false,
   }
 
   static async getInitialProps({ query }) {
@@ -266,8 +267,9 @@ export default class Addreth extends Component {
                 acc[cur.name] = cur.value
                 return acc
               }, {})
-              this.setState({ dataloaded: true, ipfsPayload: arrayToObject })
+              this.setState({ ipfsPayload: arrayToObject })
             }
+            this.setState({ dataLoaded: true })
           })
         }
       })
@@ -307,8 +309,8 @@ export default class Addreth extends Component {
     }
   }
 
-  renderBody(ipfsPayload) {
-    if (!ipfsPayload) {
+  renderBody(dataLoaded) {
+    if (!dataLoaded) {
       return <div>Back in the tube and staining...</div>
     } else if (!this.state.isAddrethValid) {
       return <NotAnAddreth />
@@ -342,81 +344,89 @@ export default class Addreth extends Component {
       editMode,
       ipfsPayload,
       claimed,
+      dataLoaded,
     } = this.state
 
-    const { account } = Web3Store.get()
-    const isOwner = account === addreth.toLowerCase()
-
     return (
-      <div>
-        <Navbar>
-          <Link route="/">
-            <Brand src="../static/images/brand.svg" />
-          </Link>
-          <p>{addreth}</p>
-          {this.validateENSDomain(addreth) && (
-            <>
-              <Brand src="../static/images/ens.svg" />
-              <p>{addreth}</p>
-            </>
-          )}
-          <Button
-            light
-            onClick={() => {
-              Router.push(`/address/${account}`)
-            }}
-          >
-            Go to my addreth
-          </Button>
-        </Navbar>
-        <Container>
-          <div>
-            <ContentWrapper>
-              {!editMode && (
-                <>
-                  <h1>{titleValue || (ipfsPayload && ipfsPayload.title)}</h1>
-                  <p>
-                    {descriptionValue ||
-                      (ipfsPayload && ipfsPayload.description)}
-                  </p>
-                </>
-              )}
-              {editMode && (
-                <EditContainer>
-                  <Title
-                    type="text"
-                    placeholder="Enter your title!"
-                    onChange={e =>
-                      this.setState({ titleValue: e.target.value })
-                    }
-                  />
-                  <Description
-                    placeholder="Enter your description!"
-                    onChange={e =>
-                      this.setState({ descriptionValue: e.target.value })
-                    }
-                  />
-                  <Button light onClick={this.saveData}>
-                    Save
-                  </Button>
-                </EditContainer>
-              )}
-              {!editMode &&
-                isOwner && (
-                  <ClaimContainer>
-                    <Button
-                      light
-                      onClick={() => this.setState({ editMode: true })}
-                    >
-                      {ipfsPayload || claimed ? 'Edit' : 'Claim now!'}
-                    </Button>
-                  </ClaimContainer>
+      <Subscribe to={[Web3Store]}>
+        {({ account }) => {
+          const isOwner = account === addreth.toLowerCase()
+          return (
+            <div>
+              <Navbar asd="ads">
+                <Link route="/">
+                  <Brand src="../static/images/brand.svg" />
+                </Link>
+                <p>{addreth}</p>
+                {this.validateENSDomain(addreth) && (
+                  <>
+                    <Brand src="../static/images/ens.svg" />
+                    <p>{addreth}</p>
+                  </>
                 )}
-            </ContentWrapper>
-          </div>
-          {this.renderBody(ipfsPayload)}
-        </Container>
-      </div>
+                <Button
+                  light
+                  onClick={() => {
+                    Router.push(`/address/${account}`)
+                  }}
+                >
+                  Go to my addreth
+                </Button>
+              </Navbar>
+              <Container>
+                <div>
+                  <ContentWrapper>
+                    {!editMode && (
+                      <>
+                        <h1>
+                          {titleValue || (ipfsPayload && ipfsPayload.title)}
+                        </h1>
+                        <p>
+                          {descriptionValue ||
+                            (ipfsPayload && ipfsPayload.description)}
+                        </p>
+                      </>
+                    )}
+                    {editMode && (
+                      <EditContainer>
+                        <Title
+                          type="text"
+                          placeholder="Enter your title!"
+                          onChange={e =>
+                            this.setState({ titleValue: e.target.value })
+                          }
+                        />
+                        <Description
+                          placeholder="Enter your description!"
+                          onChange={e =>
+                            this.setState({ descriptionValue: e.target.value })
+                          }
+                        />
+                        <Button light onClick={this.saveData}>
+                          Save
+                        </Button>
+                      </EditContainer>
+                    )}
+                    {!editMode &&
+                      dataLoaded &&
+                      isOwner && (
+                        <ClaimContainer>
+                          <Button
+                            light
+                            onClick={() => this.setState({ editMode: true })}
+                          >
+                            {ipfsPayload || claimed ? 'Edit' : 'Claim now!'}
+                          </Button>
+                        </ClaimContainer>
+                      )}
+                  </ContentWrapper>
+                </div>
+                {this.renderBody(dataLoaded)}
+              </Container>
+            </div>
+          )
+        }}
+      </Subscribe>
     )
   }
 }

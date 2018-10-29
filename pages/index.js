@@ -13,13 +13,10 @@ import { Web3Store, initMetaMask } from '../stores/web3'
 const { web3 } = Web3Store.get()
 
 const Container = styled.div`
-  background: url('static/images/bg.jpeg') no-repeat;
-  background-size: cover;
   height: 150vh;
   max-width: 100vw;
   display: grid;
   grid-template-columns: (auto-fit, 1fr);
-
   background-color: black;
 
   @media (max-width: 640px) {
@@ -28,9 +25,25 @@ const Container = styled.div`
   }
 `
 
-const Content = styled.nav`
+const Background = styled.div`
+  background: url('static/images/bg.jpeg') no-repeat;
+  background-size: cover;
+  height: 150vh;
+  max-width: 100vw;
+`
+
+const Content = styled.div`
   margin: 0 auto;
   max-width: 920px;
+`
+
+const ContentWrapper = styled.div`
+  display: grid;
+  grid-template-columns: (auto-fill, 1fr);
+  background-color: black;
+  color: white;
+  min-height: 30vh;
+  align-content: center;
 `
 
 const Navigation = styled.nav`
@@ -101,6 +114,18 @@ const TeaserText = styled.img`
   width: 300px;
 `
 
+const NetworkId = styled.h1`
+  color: #ff9a62;
+  text-align: center;
+  padding: 2rem;
+`
+
+const TextHeadline = styled.h1``
+
+const TextBlock = styled.p`
+  display: block;
+`
+
 const validateInput = input =>
   web3.utils.isAddress(input) || parseDomain(input).tld === 'eth'
 
@@ -133,41 +158,61 @@ class App extends Component {
     const { inputValue } = this.state
     return (
       <Container>
-        <Head>
-          <title>AddrETH</title>
-        </Head>
-        <Content>
-          <Navigation>
-            <NavLink>Claim</NavLink>
-            <NavLink>Search</NavLink>
-            <NavLink>Create</NavLink>
-          </Navigation>
-          <Brand src="static/images/brand.svg" />
-          <Version>v0.1</Version>
-          <SearchWrapper>
-            <SearchBar
-              id="search"
-              onChange={this.searchHandler}
-              onKeyDown={this.searchHandler}
-            />
-            <Button
-              primary
-              onClick={() =>
-                validateInput(inputValue)
-                  ? Router.push(`/address/${inputValue}`)
-                  : alerting()
-              }
-            >
-              Resolve
-            </Button>
-          </SearchWrapper>
-        </Content>
-        <MainSection>
-          <SubHeadline>Ethereum Address De-anonymization service</SubHeadline>
-          <Teaser>
-            <TeaserText src="static/images/teaser.svg" />
-          </Teaser>
-        </MainSection>
+        <Background>
+          <Head>
+            <title>AddrETH</title>
+          </Head>
+          <Content>
+            <Navigation>
+              <NavLink>Claim</NavLink>
+              <NavLink>Search</NavLink>
+              <NavLink>Create</NavLink>
+            </Navigation>
+            <Brand src="static/images/brand.svg" />
+            <Version>v0.1</Version>
+            <SearchWrapper>
+              <SearchBar
+                id="search"
+                onChange={this.searchHandler}
+                onKeyDown={this.searchHandler}
+              />
+              <Button
+                primary
+                onClick={() =>
+                  validateInput(inputValue)
+                    ? Router.push(`/address/${inputValue}`)
+                    : alerting()
+                }
+              >
+                Resolve
+              </Button>
+            </SearchWrapper>
+          </Content>
+          <MainSection>
+            <SubHeadline>"YourSpace" in Ethereum</SubHeadline>
+
+            <Teaser>
+              <TeaserText src="static/images/teaser.svg" />
+            </Teaser>
+          </MainSection>
+        </Background>
+        <ContentWrapper>
+          <Content>
+            <TextBlock>
+              Please log into Metamask - addreth is set to:{' '}
+              <NetworkId>ROPSTEN</NetworkId>
+            </TextBlock>
+            <TextHeadline>Welcome to AddrETH!</TextHeadline>
+            <TextBlock>
+              We provide a service that lets you put content to your MetaMask
+              enabled Ethereum address, as well as browse the content of others.
+            </TextBlock>
+            <TextBlock>
+              With AddrETH it is easy to mark an address for a specific purpose
+              - for this we use <strong>modules</strong>. Our first
+            </TextBlock>
+          </Content>
+        </ContentWrapper>
       </Container>
     )
   }

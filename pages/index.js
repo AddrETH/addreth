@@ -27,7 +27,7 @@ const Container = styled.div`
 const Background = styled.div`
   background: url('static/images/bg.jpeg') no-repeat;
   background-size: cover;
-  height: 150vh;
+  min-height: 100vh;
   max-width: 100vw;
 `
 

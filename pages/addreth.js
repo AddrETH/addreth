@@ -8,8 +8,6 @@ import { Router, Link } from '../routes'
 import { css } from 'glamor'
 import isIPFS from 'is-ipfs'
 
-
-import { Router, Link } from '../routes'
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
@@ -23,7 +21,6 @@ let qrCodeStyle = css({
   width: '300',
   height: '300',
   margin: 'auto',
-  justifySelf: 'center',
 })
 import { Subscribe } from 'laco-react'
 
@@ -34,7 +31,6 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: (auto-fill, 1fr);
   grid-template-rows: auto auto;
-  justify-content: space-around;
   padding: 2rem;
   min-height: 100vh;
   color: white;
@@ -62,6 +58,7 @@ const AddrethLink = styled.a`
   align-self: starts;
   grid-row: 1;
   grid-column: 1 / span 2;
+  padding: 2rem;
 `
 
 const Wrapper = styled.div`
@@ -126,7 +123,6 @@ const Input = styled.input`
     max-width: 120px;
   }
 `
-
 export default class Addreth extends Component {
   state = {
     editTitle: false,
@@ -288,19 +284,6 @@ export default class Addreth extends Component {
               newestHash = decodedInput
             }
           }
-
-          this.ipfs.catJSON(newestHash, (err, result) => {
-            if (err) {
-              console.log(err)
-            }
-            if (result && result.payload) {
-              let arrayToObject = result.payload.reduce((acc, cur) => {
-                acc[cur.name] = cur.value
-                return acc
-              }, {})
-              this.setState({ dataloaded: true, ipfsPayload: arrayToObject })
-            }
-          })
           if (newestHash) {
             this.ipfs.catJSON(newestHash, (err, result) => {
               if (err) {
@@ -333,12 +316,10 @@ export default class Addreth extends Component {
       return (
         <Container>
           <AddrethLink
-            href={`https://blockscout.com/eth/mainnet/address/${
-              this.props.addreth
-            }`}
+            href={`https://blockscout.com/eth/mainnet/address/${address}`}
             target="_blank"
           >
-            {this.props.addreth}
+            {address}
           </AddrethLink>
           <QRCode
             className={`${qrCodeStyle}`}
@@ -347,8 +328,8 @@ export default class Addreth extends Component {
             bgColor={`#89e5ff00`}
             value={this.props.addreth}
           />
-          <DonationForm address={this.props.addreth} donationNetworkID={3} />
 
+          <DonationForm address={address} donationNetworkID={3} />
           <LeaderboardContainer>
             <Leaderboard address={address} />
           </LeaderboardContainer>
@@ -370,72 +351,6 @@ export default class Addreth extends Component {
     } = this.state
 
     return (
-      <div>
-        <Navbar>
-          <Link route="/">
-            <Brand src="../static/images/brand.svg" />
-          </Link>
-          <p>{addreth}</p>
-          {this.validateENSDomain(addreth) && (
-            <>
-              <Brand src="../static/images/ens.svg" />
-              <p>{addreth}</p>
-            </>
-          )}
-          <Button
-            light
-            onClick={async () => {
-              try {
-                const address = await Utils.getMyAddress()
-                Router.push(`/address/${address}`)
-              } catch (e) {}
-            }}
-          >
-            Go to my addreth
-          </Button>
-        </Navbar>
-        <Container>
-          <div>
-            <ContentWrapper>
-              {!editMode && (
-                <>
-                  <h1>{titleValue || (ipfsPayload && ipfsPayload.title)}</h1>
-                  <p>
-                    {descriptionValue ||
-                      (ipfsPayload && ipfsPayload.description)}
-                  </p>
-                </>
-              )}
-              {editMode && (
-                <EditContainer>
-                  <Title
-                    type="text"
-                    placeholder="Enter your title!"
-                    onChange={e =>
-                      this.setState({ titleValue: e.target.value })
-                    }
-                  />
-                  <Description
-                    placeholder="Enter your description!"
-                    onChange={e =>
-                      this.setState({ descriptionValue: e.target.value })
-                    }
-                  />
-                  <Button light onClick={this.saveData}>
-                    Save
-                  </Button>
-                </EditContainer>
-              )}
-              {!editMode &&
-                isOwner && (
-                  <ClaimContainer>
-                    <Button
-                      light
-                      onClick={() => this.setState({ editMode: true })}
-                    >
-                      {ipfsPayload || claimed ? 'Edit' : 'Claim now!'}
-                    </Button>
-                  </ClaimContainer>
       <Subscribe to={[Web3Store]}>
         {({ account }) => {
           const isOwner = account === address.toLowerCase()

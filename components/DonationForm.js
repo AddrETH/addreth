@@ -6,6 +6,8 @@ import Button from '../components/Button'
 import { Web3Store } from '../stores/web3'
 
 const Container = styled.div`
+  align-self: auto;
+  justify-self: start;
   display: grid;
   color: white;
   grid-template-columns: (auto-fill, 1fr);

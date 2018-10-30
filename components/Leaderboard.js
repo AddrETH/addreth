@@ -47,6 +47,7 @@ const Line = styled.hr`
 const Total = styled.h2`
   font-weight: 100;
   padding: 2rem;
+  text-align: center;
 `
 
 const Amount = styled.span`

@@ -4,13 +4,24 @@ import IPFS from 'ipfs-mini'
 import parse from 'domain-name-parser'
 import axios from 'axios'
 import abiDecoder from 'abi-decoder'
+import { Router, Link } from '../routes'
+import { css } from 'glamor'
 import isIPFS from 'is-ipfs'
 
-import { Router, Link } from '../routes'
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
 import Button from '../components/Button'
+
+import QRCode from 'qrcode.react'
+
+let qrCodeStyle = css({
+  padding: '1rem',
+  textAlign: 'center',
+  width: '300',
+  height: '300',
+  margin: 'auto',
+})
 import { Subscribe } from 'laco-react'
 
 import { Web3Store, initMetaMask, ensLookup } from '../stores/web3'
@@ -19,8 +30,7 @@ const Container = styled.div`
   max-width: 100vw;
   display: grid;
   grid-template-columns: (auto-fill, 1fr);
-  justify-content: center;
-  align-content: start;
+  grid-template-rows: auto auto;
   padding: 2rem;
   min-height: 100vh;
   color: white;
@@ -46,6 +56,9 @@ const AddrethLink = styled.a`
   text-decoration: none;
   justify-self: center;
   align-self: starts;
+  grid-row: 1;
+  grid-column: 1 / span 2;
+  padding: 2rem;
 `
 
 const Wrapper = styled.div`
@@ -110,7 +123,6 @@ const Input = styled.input`
     max-width: 120px;
   }
 `
-
 export default class Addreth extends Component {
   state = {
     editTitle: false,
@@ -248,7 +260,7 @@ export default class Addreth extends Component {
   findAddress = () => {
     const { web3 } = Web3Store.get()
     const bs =
-      'http://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
+      'https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
       //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
       this.vanityaddress
     axios
@@ -267,9 +279,11 @@ export default class Addreth extends Component {
           let newestHash = null
           for (let i = 0; i < response.data.result.length; i++) {
             var t = response.data.result[i]
-            const decodedInput = web3.utils.hexToUtf8(t.input)
-            if (isIPFS.multihash(decodedInput)) {
-              newestHash = decodedInput
+            if (t.from === this.state.address.toLowerCase()) {
+              const decodedInput = web3.utils.hexToUtf8(t.input)
+              if (isIPFS.multihash(decodedInput)) {
+                newestHash = decodedInput
+              }
             }
           }
           if (newestHash) {
@@ -285,6 +299,8 @@ export default class Addreth extends Component {
                 this.setState({ dataLoaded: true, ipfsPayload: arrayToObject })
               }
             })
+          } else {
+            this.setState({ dataLoaded: true })
           }
         }
       })
@@ -303,15 +319,21 @@ export default class Addreth extends Component {
     } else {
       return (
         <Container>
-          <div>
-            <AddrethLink
-              href={`https://blockscout.com/eth/mainnet/address/${address}`}
-              target="_blank"
-            >
-              {address}
-            </AddrethLink>
-          </div>
-          <DonationForm address={address} donationNetworkID={3} />
+          <AddrethLink
+            href={`https://blockscout.com/eth/ropsten/address/${address}`}
+            target="_blank"
+          >
+            {address}
+          </AddrethLink>
+          <QRCode
+            className={`${qrCodeStyle}`}
+            renderAs={`svg`}
+            fgColor={`#2d0072`}
+            bgColor={`#89e5ff00`}
+            value={this.props.addreth}
+          />
+
+          <DonationForm address={address} donationNetworkID={0} />
           <LeaderboardContainer>
             <Leaderboard address={address} />
           </LeaderboardContainer>

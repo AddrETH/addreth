@@ -6,13 +6,17 @@ import Button from '../components/Button'
 import { Web3Store } from '../stores/web3'
 
 const Container = styled.div`
+  align-self: auto;
+  justify-self: start;
   display: grid;
   color: white;
   grid-template-columns: (auto-fill, 1fr);
 `
 
 const TransactionContainer = styled.div`
+  display: grid;
   align-content: center;
+  justify-items: center;
 `
 
 const TransactionForm = styled.form`
@@ -25,6 +29,7 @@ const TransactionForm = styled.form`
 const Input = styled.input`
   border-radius: 0.2rem;
   padding: 0.3rem;
+  min-width: 280px;
 `
 
 const Thanks = styled.span`
@@ -39,7 +44,7 @@ export default class DonationForm extends PureComponent {
   constructor(props) {
     super()
     this.state = {
-      netId: 3,
+      netId: 0,
       thanks: false,
     }
   }

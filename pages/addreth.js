@@ -248,7 +248,7 @@ export default class Addreth extends Component {
   findAddress = () => {
     const { web3 } = Web3Store.get()
     const bs =
-      'http://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
+      'http://api.etherscan.io/api?module=account&action=txlist&address=' +
       //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
       this.vanityaddress
     axios
@@ -311,7 +311,7 @@ export default class Addreth extends Component {
               {address}
             </AddrethLink>
           </div>
-          <DonationForm address={address} donationNetworkID={3} />
+          <DonationForm address={address} donationNetworkID={0} />
           <LeaderboardContainer>
             <Leaderboard address={address} />
           </LeaderboardContainer>

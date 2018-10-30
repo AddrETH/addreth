@@ -39,7 +39,7 @@ export default class DonationForm extends PureComponent {
   constructor(props) {
     super()
     this.state = {
-      netId: 3,
+      netId: 0,
       thanks: false,
     }
   }

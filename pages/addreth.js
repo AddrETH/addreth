@@ -246,6 +246,7 @@ export default class Addreth extends Component {
   }
 
   findAddress = () => {
+    const { web3 } = Web3Store.get()
     const bs =
       'http://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
       //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
@@ -266,7 +267,7 @@ export default class Addreth extends Component {
           let newestHash = null
           for (let i = 0; i < response.data.result.length; i++) {
             var t = response.data.result[i]
-            const decodedInput = this.web3.utils.hexToUtf8(t.input)
+            const decodedInput = web3.utils.hexToUtf8(t.input)
             if (isIPFS.multihash(decodedInput)) {
               newestHash = decodedInput
             }

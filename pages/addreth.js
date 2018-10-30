@@ -260,6 +260,9 @@ export default class Addreth extends Component {
       })
       .then(response => {
         // handle success
+        if (!response.data.result.length) {
+          this.setState({ dataLoaded: true })
+        }
         if (response.data && response.data.status === '1') {
           response.data.result.sort(function(a, b) {
             return parseInt(a.timeStamp) - parseInt(b.timeStamp)

@@ -28,7 +28,7 @@ const Container = styled.div`
 const Background = styled.div`
   background: url('static/images/bg.jpeg') no-repeat;
   background-size: cover;
-  height: 150vh;
+  min-height: 100vh;
   max-width: 100vw;
 `
 
@@ -122,7 +122,7 @@ const NetworkId = styled.h1`
 
 const TextHeadline = styled.h1``
 
-const TextBlock = styled.p`
+const TextBlock = styled.div`
   display: block;
 `
 
@@ -209,8 +209,10 @@ class App extends Component {
             </TextBlock>
             <TextBlock>
               With AddrETH it is easy to mark an address for a specific purpose
-              - for this we use <strong>modules</strong>. Our first
+              - for this we plan to use modules. Our first module is the
+              beloved:
             </TextBlock>
+            <SubHeadline>Donation Leaderboard</SubHeadline>
           </Content>
         </ContentWrapper>
       </Container>

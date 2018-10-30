@@ -260,9 +260,6 @@ export default class Addreth extends Component {
       })
       .then(response => {
         // handle success
-        if (!response.data.result.length) {
-          this.setState({ dataLoaded: true })
-        }
         if (response.data && response.data.status === '1') {
           response.data.result.sort(function(a, b) {
             return parseInt(a.timeStamp) - parseInt(b.timeStamp)
@@ -270,9 +267,11 @@ export default class Addreth extends Component {
           let newestHash = null
           for (let i = 0; i < response.data.result.length; i++) {
             var t = response.data.result[i]
-            const decodedInput = web3.utils.hexToUtf8(t.input)
-            if (isIPFS.multihash(decodedInput)) {
-              newestHash = decodedInput
+            if (t.from === this.state.address.toLowerCase()) {
+              const decodedInput = web3.utils.hexToUtf8(t.input)
+              if (isIPFS.multihash(decodedInput)) {
+                newestHash = decodedInput
+              }
             }
           }
           if (newestHash) {
@@ -288,6 +287,8 @@ export default class Addreth extends Component {
                 this.setState({ dataLoaded: true, ipfsPayload: arrayToObject })
               }
             })
+          } else {
+            this.setState({ dataLoaded: true })
           }
         }
       })

@@ -77,7 +77,7 @@ export default class Leaderboard extends PureComponent {
     const json = await axios.get(bs, {
       headers: {
         Authorization: '',
-        'Target-URL': 'https://blockscout.com/eth/mainnet/api',
+        'Target-URL': 'https://blockscout.com/eth/ropsten/api',
       },
     })
     return this.processTxList(json.data.result)
@@ -161,7 +161,7 @@ export default class Leaderboard extends PureComponent {
             {tx.hash.map((hash, index) => (
               <TxLink
                 key={hash}
-                href={`https://blockscout.com/eth/mainnet/tx/${hash}`}
+                href={`https://blockscout.com/eth/ropsten/tx/${hash}`}
                 target="_blank"
               >
                 {/* [{index + 1}] */}

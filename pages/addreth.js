@@ -260,7 +260,7 @@ export default class Addreth extends Component {
   findAddress = () => {
     const { web3 } = Web3Store.get()
     const bs =
-      'https://api.etherscan.io/api?module=account&action=txlist&address=' +
+      'https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
       //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
       this.vanityaddress
     axios
@@ -320,7 +320,7 @@ export default class Addreth extends Component {
       return (
         <Container>
           <AddrethLink
-            href={`https://blockscout.com/eth/mainnet/address/${address}`}
+            href={`https://blockscout.com/eth/ropsten/address/${address}`}
             target="_blank"
           >
             {address}

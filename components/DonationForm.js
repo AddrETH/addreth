@@ -47,7 +47,7 @@ export default class DonationForm extends PureComponent {
   handleDonate = event => {
     event.preventDefault()
     const form = event.target
-    const { web3, account } = Web3Store
+    const { web3, account } = Web3Store.get()
     let donateWei = new web3.utils.BN(
       web3.utils.toWei(form.elements['amount'].value, 'ether')
     )

@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
 import styled from 'styled-components'
-import Web3 from 'web3'
 import Emojify from 'react-emojione'
 import axios from 'axios'
 import { FaBolt } from 'react-icons/fa'
+
+import { Web3Store } from '../stores/web3'
 
 const LeaderboardContainer = styled.div`
   display: grid;
@@ -82,14 +83,14 @@ export default class Leaderboard extends PureComponent {
   }
 
   processTxList = ethlist => {
-    let myweb3 = new Web3(web3.currentProvider)
+    const { web3 } = Web3Store.get()
     let filteredEthList = ethlist
       .map(obj => {
-        obj.value = new myweb3.utils.BN(obj.value) // convert string to BigNumber
+        obj.value = new web3.utils.BN(obj.value) // convert string to BigNumber
         return obj
       })
       .filter(obj => {
-        return obj.value.cmp(new myweb3.utils.BN(0))
+        return obj.value.cmp(new web3.utils.BN(0))
       }) // filter out zero-value transactions
       .reduce((acc, cur) => {
         // group by address and sum tx value
@@ -104,7 +105,7 @@ export default class Leaderboard extends PureComponent {
         if (typeof acc[cur.from] === 'undefined') {
           acc[cur.from] = {
             from: cur.from,
-            value: new myweb3.utils.BN(0),
+            value: new web3.utils.BN(0),
             input: cur.input,
             hash: [],
           }
@@ -112,7 +113,7 @@ export default class Leaderboard extends PureComponent {
         acc[cur.from].value = cur.value.add(acc[cur.from].value)
         acc[cur.from].input =
           cur.input !== '0x' && cur.input !== '0x00'
-            ? myweb3.utils.hexToAscii(cur.input)
+            ? web3.utils.hexToAscii(cur.input)
             : acc[cur.from].input
         acc[cur.from].hash.push(cur.hash)
         return acc
@@ -130,14 +131,14 @@ export default class Leaderboard extends PureComponent {
       })
     const ethTotal = filteredEthList.reduce((acc, cur) => {
       return acc.add(cur.value)
-    }, new myweb3.utils.BN(0))
+    }, new web3.utils.BN(0))
     filteredEthList = filteredEthList.map(obj => {
-      obj.value = parseFloat(myweb3.utils.fromWei(obj.value)).toFixed(2)
+      obj.value = parseFloat(web3.utils.fromWei(obj.value)).toFixed(2)
       return obj
     })
     return this.setState({
       txs: filteredEthList,
-      totalAmount: parseFloat(myweb3.utils.fromWei(ethTotal)).toFixed(2),
+      totalAmount: parseFloat(web3.utils.fromWei(ethTotal)).toFixed(2),
     })
   }
 

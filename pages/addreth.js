@@ -6,6 +6,7 @@ import parse from 'domain-name-parser'
 import axios from 'axios'
 import abiDecoder from 'abi-decoder'
 import { Router, Link } from '../routes'
+import isIPFS from 'is-ipfs'
 
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
@@ -123,6 +124,7 @@ export default class Addreth extends Component {
     claimed: false,
     dataloaded: false,
   }
+  vanityaddress = '0x1337000000000000000000000000000000000000'
 
   static async getInitialProps({ query }) {
     return query
@@ -256,20 +258,23 @@ export default class Addreth extends Component {
     return new Promise((resolve, reject) => {
       const msgParams = this.makeData()
       this.ipfs.addJSON({ payload: msgParams }, (err, result) => {
-        resolve(result)
-        const myContract = new this.web3.eth.Contract(
-          this.abi,
-          '0xf7d934776da4d1734f36d86002de36954d7dd528',
+        //        resolve(result)
+        let message = this.web3.utils.toHex(result)
+
+        this.web3.eth.sendTransaction(
           {
             from: this.state.account,
+            to: this.vanityaddress,
+            data: message,
+            gas: 300000,
+          },
+          (err, hash) => {
+            if (err) {
+              return reject(err)
+            }
+            resolve(hash)
           }
         )
-        myContract.methods.saveEth(result).send((err, tx) => {
-          if (err) {
-            return reject(err)
-          }
-          resolve(tx)
-        })
       })
     })
   }
@@ -290,50 +295,46 @@ export default class Addreth extends Component {
     return msgParams
   }
 
-  findAddress(address) {
-    const bs = `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=0xf7d934776da4d1734f36d86002de36954d7dd528`
+  findAddress = address => {
+    const bs =
+      'http://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
+      //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
+      this.vanityaddress
     axios
       .get(bs, {
-        headers: {
-          Authorization: '',
-          'Target-URL': 'https://blockscout.com/eth/ropsten/api',
-        },
+        //headers: {
+        // Authorization: '',
+        // 'Target-URL': 'https://blockscout.com/eth/ropsten/api',
+        //},
       })
       .then(response => {
         // handle success
-        console.log(response)
-
         if (response.data && response.data.status === '1') {
           response.data.result.sort(function(a, b) {
-            return parseInt(a.nonce) - parseInt(b.nonce)
+            return parseInt(a.timeStamp) - parseInt(b.timeStamp)
           })
-          let newestHash = ''
+          let newestHash = null
           for (let i = 0; i < response.data.result.length; i++) {
             var t = response.data.result[i]
-            if (t.contractAddress == '' && t.from == address.toLowerCase()) {
-              const decodedData = abiDecoder.decodeMethod(t.input)
-
-              if (decodedData.name == 'saveEth') {
-                const hash = decodedData.params.find(element => {
-                  return element.name === '_ipfsHash'
-                }).value
-                newestHash = hash
-              }
+            const decodedInput = this.web3.utils.hexToUtf8(t.input)
+            if (isIPFS.multihash(decodedInput)) {
+              newestHash = decodedInput
             }
           }
-
-          this.ipfs.catJSON(newestHash, (err, result) => {
-            if (err) {
-              console.log(err)
-            }
-            if (result && result.payload) {
-              let arrayToObject = result.payload.reduce((acc, cur) => {
-                acc[cur.name] = cur.value
-                return acc
-              }, {})
-              this.setState({ dataloaded:true, ipfsPayload: arrayToObject })
-            }
-          })
+          if (newestHash) {
+            this.ipfs.catJSON(newestHash, (err, result) => {
+              if (err) {
+                console.log(err)
+              }
+              if (result && result.payload) {
+                let arrayToObject = result.payload.reduce((acc, cur) => {
+                  acc[cur.name] = cur.value
+                  return acc
+                }, {})
+                this.setState({ dataloaded: true, ipfsPayload: arrayToObject })
+              }
+            })
+          }
         }
       })
       .catch(function(error) {
@@ -424,12 +425,15 @@ export default class Addreth extends Component {
               <p>{addreth}</p>
             </>
           )}
-          <Button light onClick={async () => {
+          <Button
+            light
+            onClick={async () => {
               try {
                 const address = await Utils.getMyAddress()
                 Router.push(`/address/${address}`)
               } catch (e) {}
-            }}>
+            }}
+          >
             Go to my addreth
           </Button>
         </Navbar>

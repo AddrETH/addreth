@@ -20,7 +20,7 @@ let qrCodeStyle = css({
   textAlign: 'center',
   width: '300',
   height: '300',
-  margin: 'auto',
+  justifySelf: 'end',
 })
 import { Subscribe } from 'laco-react'
 
@@ -34,6 +34,7 @@ const Container = styled.div`
   padding: 2rem;
   min-height: 100vh;
   color: white;
+  grid-gap: 2rem;
 
   background: linear-gradient(180deg, #6200ee 0%, rgba(98, 0, 238, 0.49) 100%),
     #c4c4c4;

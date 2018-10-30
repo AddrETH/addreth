@@ -6,19 +6,30 @@ import parse from 'domain-name-parser'
 import axios from 'axios'
 import abiDecoder from 'abi-decoder'
 import { Router, Link } from '../routes'
+import { css } from 'glamor'
 
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
 import Utils from '../utils'
 import Button from '../components/Button'
+import QRCode from 'qrcode.react'
+
+let qrCodeStyle = css({
+  padding: '1rem',
+  textAlign: 'center',
+  width: '300',
+  height: '300',
+  margin: 'auto',
+  justifySelf: 'center',
+})
 
 const Container = styled.div`
   max-width: 100vw;
   display: grid;
   grid-template-columns: (auto-fill, 1fr);
-  justify-content: center;
-  align-content: start;
+  grid-template-rows: auto auto;
+  justify-content: space-around;
   padding: 2rem;
   min-height: 100vh;
   color: white;
@@ -44,6 +55,8 @@ const AddrethLink = styled.a`
   text-decoration: none;
   justify-self: center;
   align-self: starts;
+  grid-row: 1;
+  grid-column: 1 / span 2;
 `
 
 const Wrapper = styled.div`
@@ -331,7 +344,7 @@ export default class Addreth extends Component {
                 acc[cur.name] = cur.value
                 return acc
               }, {})
-              this.setState({ dataloaded:true, ipfsPayload: arrayToObject })
+              this.setState({ dataloaded: true, ipfsPayload: arrayToObject })
             }
           })
         }
@@ -388,6 +401,13 @@ export default class Addreth extends Component {
           >
             {this.props.addreth}
           </AddrethLink>
+          <QRCode
+            className={`${qrCodeStyle}`}
+            renderAs={`svg`}
+            fgColor={`#2d0072`}
+            bgColor={`#89e5ff00`}
+            value={this.props.addreth}
+          />
           <DonationForm address={this.props.addreth} donationNetworkID={3} />
           <LeaderboardContainer>
             <Leaderboard address={this.props.addreth} />
@@ -424,12 +444,15 @@ export default class Addreth extends Component {
               <p>{addreth}</p>
             </>
           )}
-          <Button light onClick={async () => {
+          <Button
+            light
+            onClick={async () => {
               try {
                 const address = await Utils.getMyAddress()
                 Router.push(`/address/${address}`)
               } catch (e) {}
-            }}>
+            }}
+          >
             Go to my addreth
           </Button>
         </Navbar>

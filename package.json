@@ -15,6 +15,8 @@
     "ethjs-provider-http": "^0.1.6",
     "express": "^4.16.3",
     "ipfs-mini": "^1.1.2",
+    "laco": "^1.2.0",
+    "laco-react": "^1.0.0",
     "is-ipfs": "^0.4.7",
     "next": "^7.0.1",
     "next-routes": "^1.4.2",

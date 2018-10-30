@@ -1,15 +1,16 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import Head from 'next/head'
-import Web3 from 'web3'
 import parseDomain from 'domain-name-parser'
 
-import { Router, Link } from '../routes'
+import { Router } from '../routes'
 
 import SearchBar from '../components/SearchBar'
 import Button from '../components/Button'
 
-const web3 = new Web3()
+import { Web3Store, initMetaMask } from '../stores/web3'
+
+const { web3 } = Web3Store.get()
 
 const Container = styled.div`
   height: 150vh;
@@ -134,6 +135,10 @@ const alerting = () =>
 class App extends Component {
   state = {
     inputValue: '',
+  }
+
+  componentDidMount() {
+    initMetaMask()
   }
 
   searchHandler = e => {

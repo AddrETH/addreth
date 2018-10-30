@@ -1,18 +1,19 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import Web3 from 'web3'
 import IPFS from 'ipfs-mini'
 import parse from 'domain-name-parser'
 import axios from 'axios'
 import abiDecoder from 'abi-decoder'
-import { Router, Link } from '../routes'
 import isIPFS from 'is-ipfs'
 
+import { Router, Link } from '../routes'
 import Leaderboard from '../components/Leaderboard'
 import DonationForm from '../components/DonationForm'
 import NotAnAddreth from '../components/NotAnAddreth'
-import Utils from '../utils'
 import Button from '../components/Button'
+import { Subscribe } from 'laco-react'
+
+import { Web3Store, initMetaMask, ensLookup } from '../stores/web3'
 
 const Container = styled.div`
   max-width: 100vw;
@@ -112,8 +113,6 @@ const Input = styled.input`
 
 export default class Addreth extends Component {
   state = {
-    metamaskAvailable: false,
-    account: null,
     editTitle: false,
     titleValue: '',
     editDescription: false,
@@ -122,7 +121,10 @@ export default class Addreth extends Component {
     isAddrethValidated: false,
     editMode: false,
     claimed: false,
-    dataloaded: false,
+    dataLoaded: false,
+    address: '',
+    ensDomain: '',
+    error: false,
   }
   vanityaddress = '0x1337000000000000000000000000000000000000'
 
@@ -156,81 +158,29 @@ export default class Addreth extends Component {
     abiDecoder.addABI(this.abi)
   }
 
-  componentDidMount() {
-    this.initMetaMask()
-    this.findAddress(this.props.addreth)
-    this.ensureEthAddress(this.props.addreth)
-    this.validateAddreth(this.props.addreth)
+  async componentDidMount() {
+    const { addreth } = this.props
+    const { web3 } = Web3Store.get()
+
+    initMetaMask()
+
+    if (web3.utils.isAddress(addreth)) {
+      this.findAddress(addreth)
+      this.setState({ address: addreth })
+    } else {
+      try {
+        const address = await ensLookup(addreth)
+        this.findAddress(address)
+        this.setState({ address, ensDomain: addreth })
+      } catch (error) {
+        this.setState({ error: true })
+      }
+    }
   }
 
   validateENSDomain(addreth) {
     const domain = parse(addreth)
     return domain.tld == 'eth'
-  }
-
-  initMetaMask = () => {
-    /*eslint-disable no-undef*/
-    window.addEventListener('load', async () => {
-      // Modern dapp browsers...
-      if (window.ethereum) {
-        window.web3 = new Web3(ethereum)
-        this.web3 = window.web3
-        try {
-          // Request account access if needed
-          await ethereum.enable()
-          // Acccounts now exposed
-          web3.eth.getAccounts().then(a => {
-            this.setState({
-              metamaskAvailable: true,
-              account: a[0].toLowerCase(),
-            })
-          })
-
-          web3.currentProvider.publicConfigStore.on('update', res => {
-            console.log('web3 updated..', res)
-            this.setState({
-              metamaskAvailable: true,
-              account: res.selectedAddress.toLowerCase(),
-            })
-          })
-        } catch (error) {
-          this.setState({
-            metamaskAvailable: false,
-          })
-          // User denied account access...
-        }
-      }
-      // Legacy dapp browsers...
-      else if (window.web3) {
-        window.web3 = new Web3(web3.currentProvider)
-        this.web3 = window.web3
-
-        // Acccounts always exposed
-        web3.eth.getAccounts().then(a => {
-          console.log(a)
-          this.setState({
-            metamaskAvailable: true,
-            account: a[0].toLowerCase(),
-          })
-        })
-
-        web3.currentProvider.publicConfigStore.on('update', res => {
-          console.log('web3 updated..', res)
-          this.setState({
-            metamaskAvailable: true,
-            account: res.selectedAddress.toLowerCase(),
-          })
-        })
-      }
-      // Non-dapp browsers...
-      else {
-        console.log(
-          'Non-Ethereum browser detected. You should consider trying MetaMask!'
-        )
-        this.setState({ metamaskAvailable: false })
-      }
-    })
-    /*eslint-enable no-undef*/
   }
 
   handleTitle = e => {
@@ -251,6 +201,7 @@ export default class Addreth extends Component {
 
   // save data on IPFS & send transaction immediately
   saveData = () => {
+    const { web3, account } = Web3Store.get()
     this.setState({
       editMode: false,
       claimed: true,
@@ -258,12 +209,11 @@ export default class Addreth extends Component {
     return new Promise((resolve, reject) => {
       const msgParams = this.makeData()
       this.ipfs.addJSON({ payload: msgParams }, (err, result) => {
-        //        resolve(result)
-        let message = this.web3.utils.toHex(result)
+        let message = web3.utils.toHex(result)
 
-        this.web3.eth.sendTransaction(
+        web3.eth.sendTransaction(
           {
-            from: this.state.account,
+            from: account,
             to: this.vanityaddress,
             data: message,
             gas: 300000,
@@ -295,7 +245,8 @@ export default class Addreth extends Component {
     return msgParams
   }
 
-  findAddress = address => {
+  findAddress = () => {
+    const { web3 } = Web3Store.get()
     const bs =
       'http://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
       //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
@@ -316,7 +267,7 @@ export default class Addreth extends Component {
           let newestHash = null
           for (let i = 0; i < response.data.result.length; i++) {
             var t = response.data.result[i]
-            const decodedInput = this.web3.utils.hexToUtf8(t.input)
+            const decodedInput = web3.utils.hexToUtf8(t.input)
             if (isIPFS.multihash(decodedInput)) {
               newestHash = decodedInput
             }
@@ -331,7 +282,7 @@ export default class Addreth extends Component {
                   acc[cur.name] = cur.value
                   return acc
                 }, {})
-                this.setState({ dataloaded: true, ipfsPayload: arrayToObject })
+                this.setState({ dataLoaded: true, ipfsPayload: arrayToObject })
               }
             })
           }
@@ -343,55 +294,26 @@ export default class Addreth extends Component {
       })
   }
 
-  async probeEnsDomain(addreth) {
-    if (this.validateENSDomain(addreth)) {
-      try {
-        await Utils.resolveEnsDomain(addreth)
-        return true
-      } catch (e) {
-        console.error(e)
-        return false
-      }
-    }
-  }
-
-  async validateAddreth(addreth) {
-    const web3 = new Web3()
-    const isValid =
-      web3.utils.isAddress(addreth) || (await this.probeEnsDomain(addreth))
-    this.setState({ isAddrethValid: isValid, isAddrethValidated: true })
-  }
-
-  async ensureEthAddress(addreth) {
-    if (this.validateENSDomain(addreth)) {
-      try {
-        let address = await Utils.resolveEnsDomain(addreth)
-        Router.push(`/addreth/${address}`)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  renderBody() {
-    if (!this.state.isAddrethValidated) {
+  renderBody(dataLoaded) {
+    const { error, address } = this.state
+    if (!dataLoaded && !error) {
       return <div>Back in the tube and staining...</div>
-    } else if (!this.state.isAddrethValid) {
+    } else if (error) {
       return <NotAnAddreth />
     } else {
       return (
         <Container>
-          <AddrethLink
-            href={`https://blockscout.com/eth/mainnet/address/${
-              this.props.addreth
-            }`}
-            target="_blank"
-          >
-            {this.props.addreth}
-          </AddrethLink>
-          <DonationForm address={this.props.addreth} donationNetworkID={3} />
+          <div>
+            <AddrethLink
+              href={`https://blockscout.com/eth/mainnet/address/${address}`}
+              target="_blank"
+            >
+              {address}
+            </AddrethLink>
+          </div>
+          <DonationForm address={address} donationNetworkID={3} />
           <LeaderboardContainer>
-            <Leaderboard address={this.props.addreth} />
+            <Leaderboard address={address} />
           </LeaderboardContainer>
         </Container>
       )
@@ -399,92 +321,97 @@ export default class Addreth extends Component {
   }
 
   render() {
-    const { addreth } = this.props
+    const { address } = this.state
     const {
-      account,
       titleValue,
       descriptionValue,
       editMode,
       ipfsPayload,
       claimed,
-      dataloaded,
+      dataLoaded,
+      ensDomain,
     } = this.state
 
-    const isOwner = account === addreth.toLowerCase()
-
     return (
-      <div>
-        <Navbar>
-          <Link route="/">
-            <Brand src="../static/images/brand.svg" />
-          </Link>
-          <p>{addreth}</p>
-          {this.validateENSDomain(addreth) && (
-            <>
-              <Brand src="../static/images/ens.svg" />
-              <p>{addreth}</p>
-            </>
-          )}
-          <Button
-            light
-            onClick={async () => {
-              try {
-                const address = await Utils.getMyAddress()
-                Router.push(`/address/${address}`)
-              } catch (e) {}
-            }}
-          >
-            Go to my addreth
-          </Button>
-        </Navbar>
-        <Container>
-          <div>
-            <ContentWrapper>
-              {!editMode && (
-                <>
-                  <h1>{titleValue || (ipfsPayload && ipfsPayload.title)}</h1>
-                  <p>
-                    {descriptionValue ||
-                      (ipfsPayload && ipfsPayload.description)}
-                  </p>
-                </>
-              )}
-              {editMode && (
-                <EditContainer>
-                  <Title
-                    type="text"
-                    placeholder="Enter your title!"
-                    onChange={e =>
-                      this.setState({ titleValue: e.target.value })
-                    }
-                  />
-                  <Description
-                    placeholder="Enter your description!"
-                    onChange={e =>
-                      this.setState({ descriptionValue: e.target.value })
-                    }
-                  />
-                  <Button light onClick={this.saveData}>
-                    Save
-                  </Button>
-                </EditContainer>
-              )}
-              {!editMode &&
-                isOwner && (
-                  <ClaimContainer>
-                    <Button
-                      light
-                      onClick={() => this.setState({ editMode: true })}
-                    >
-                      {ipfsPayload || claimed ? 'Edit' : 'Claim now!'}
-                    </Button>
-                  </ClaimContainer>
+      <Subscribe to={[Web3Store]}>
+        {({ account }) => {
+          const isOwner = account === address.toLowerCase()
+          return (
+            <div>
+              <Navbar>
+                <Link route="/">
+                  <Brand src="../static/images/brand.svg" />
+                </Link>
+                <p>{address}</p>
+                {ensDomain && (
+                  <>
+                    <Brand src="../static/images/ens.svg" />
+                    <p>{ensDomain}</p>
+                  </>
                 )}
-            </ContentWrapper>
-          </div>
-          {this.renderBody()}
-        </Container>
-      </div>
+                <Button
+                  light
+                  onClick={() => {
+                    Router.push(`/address/${account}`)
+                  }}
+                >
+                  Go to my addreth
+                </Button>
+              </Navbar>
+              <Container>
+                <div>
+                  <ContentWrapper>
+                    {!editMode && (
+                      <>
+                        <h1>
+                          {titleValue || (ipfsPayload && ipfsPayload.title)}
+                        </h1>
+                        <p>
+                          {descriptionValue ||
+                            (ipfsPayload && ipfsPayload.description)}
+                        </p>
+                      </>
+                    )}
+                    {editMode && (
+                      <EditContainer>
+                        <Title
+                          type="text"
+                          placeholder="Enter your title!"
+                          onChange={e =>
+                            this.setState({ titleValue: e.target.value })
+                          }
+                        />
+                        <Description
+                          placeholder="Enter your description!"
+                          onChange={e =>
+                            this.setState({ descriptionValue: e.target.value })
+                          }
+                        />
+                        <Button light onClick={this.saveData}>
+                          Save
+                        </Button>
+                      </EditContainer>
+                    )}
+                    {!editMode &&
+                      dataLoaded &&
+                      isOwner && (
+                        <ClaimContainer>
+                          <Button
+                            light
+                            onClick={() => this.setState({ editMode: true })}
+                          >
+                            {ipfsPayload || claimed ? 'Edit' : 'Claim now!'}
+                          </Button>
+                        </ClaimContainer>
+                      )}
+                  </ContentWrapper>
+                </div>
+                {this.renderBody(dataLoaded)}
+              </Container>
+            </div>
+          )
+        }}
+      </Subscribe>
     )
   }
 }

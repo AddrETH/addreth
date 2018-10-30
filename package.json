@@ -17,6 +17,7 @@
     "ipfs-mini": "^1.1.2",
     "laco": "^1.2.0",
     "laco-react": "^1.0.0",
+    "is-ipfs": "^0.4.7",
     "next": "^7.0.1",
     "next-routes": "^1.4.2",
     "react": "^16.5.2",

@@ -73,6 +73,7 @@ export default class Leaderboard extends PureComponent {
   };
 
   fetchTxs = async address => {
+
     const bs = `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=${address}`;
     const etherscan = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}`;
 
@@ -87,6 +88,7 @@ export default class Leaderboard extends PureComponent {
     );
     return this.processTxList(json.data.result);
   };
+
 
   processTxList = ethlist => {
     const { web3 } = Web3Store.get();
@@ -166,7 +168,7 @@ export default class Leaderboard extends PureComponent {
             {tx.hash.map((hash, index) => (
               <TxLink
                 key={hash}
-                href={`https://blockscout.com/eth/mainnet/tx/${hash}`}
+                href={`https://blockscout.com/eth/ropsten/tx/${hash}`}
                 target="_blank"
               >
                 {/* [{index + 1}] */}

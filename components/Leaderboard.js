@@ -73,7 +73,9 @@ export default class Leaderboard extends PureComponent {
   }
 
   fetchTxs = async address => {
-    const bs = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}`
+    const bs =
+      `https://api.etherscan.io/api?module=account&action=txlist&address=${address}` +
+      '&apikey=6DIUB7X6S92YJR6KXKF8V8ZU55IXT5PN2S'
     const json = await axios.get(bs)
     return this.processTxList(json.data.result)
   }

@@ -17,10 +17,9 @@ import QRCode from 'qrcode.react'
 
 let qrCodeStyle = css({
   padding: '1rem',
-  textAlign: 'center',
   width: '300',
   height: '300',
-  margin: 'auto',
+  justifySelf: 'end',
 })
 import { Subscribe } from 'laco-react'
 
@@ -34,6 +33,7 @@ const Container = styled.div`
   padding: 2rem;
   min-height: 100vh;
   color: white;
+  grid-gap: 2rem;
 
   background: linear-gradient(180deg, #6200ee 0%, rgba(98, 0, 238, 0.49) 100%),
     #c4c4c4;
@@ -265,7 +265,7 @@ export default class Addreth extends Component {
   findAddress = () => {
     const { web3 } = Web3Store.get()
     const bs =
-      'https://api.etherscan.io/api?module=account&action=txlist&address=' +
+      'https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
       //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
       this.vanityaddress
     axios

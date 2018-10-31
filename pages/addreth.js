@@ -123,6 +123,11 @@ const Input = styled.input`
     max-width: 120px;
   }
 `
+
+const Loading = styled.div`
+  justify-self: center;
+`
+
 export default class Addreth extends Component {
   state = {
     editTitle: false,
@@ -313,14 +318,14 @@ export default class Addreth extends Component {
   renderBody(dataLoaded) {
     const { error, address } = this.state
     if (!dataLoaded && !error) {
-      return <div>Back in the tube and staining...</div>
+      return <Loading>Back in the tube and staining...</Loading>
     } else if (error) {
       return <NotAnAddreth />
     } else {
       return (
         <Container>
           <AddrethLink
-            href={`https://blockscout.com/eth/mainnet/address/${address}`}
+            href={`https://etherscan.io/address/${address}`}
             target="_blank"
           >
             {address}

@@ -79,7 +79,7 @@ export default class Leaderboard extends PureComponent {
   }
 
   processTxList = ethlist => {
-    const { web3 } = Web3Store.get()
+    const { web3, account } = Web3Store.get()
     let filteredEthList = ethlist
       .map(obj => {
         obj.value = new web3.utils.BN(obj.value) // convert string to BigNumber
@@ -94,7 +94,7 @@ export default class Leaderboard extends PureComponent {
           // tx was not successful - skip it.
           return acc
         }
-        if (cur.from == this.props.address) {
+        if (cur.from == account) {
           // tx was outgoing - don't add it in
           return acc
         }

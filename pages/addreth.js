@@ -265,16 +265,10 @@ export default class Addreth extends Component {
   findAddress = () => {
     const { web3 } = Web3Store.get()
     const bs =
-      'https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=' +
-      //      `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=` +
+      'https://api.etherscan.io/api?module=account&action=txlist&address=' +
       this.vanityaddress
     axios
-      .get(bs, {
-        //headers: {
-        // Authorization: '',
-        // 'Target-URL': 'https://blockscout.com/eth/ropsten/api',
-        //},
-      })
+      .get(bs)
       .then(response => {
         // handle success
         if (response.data && response.data.status === '1') {

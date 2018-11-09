@@ -1,29 +1,5 @@
 import Document, { Head, Main, NextScript } from 'next/document'
-import {
-  styledNormalize,
-  injectGlobal,
-  ServerStyleSheet,
-} from 'styled-components'
-
-injectGlobal`
-  ${styledNormalize}
-  body {
-    line-height: 1.5;
-  }
-  html {
-    box-sizing: border-box;
-    overflow-wrap: break-word;
-    margin: 0;
-  }
-  *,
-  *::before,
-  *::after {
-    box-sizing: inherit;
-    overflow-wrap: break-word;
-    margin: 0;
-    font-family: 'Roboto Mono', monospace;
-  }
-`
+import { ServerStyleSheet } from 'styled-components'
 
 export default class MyDocument extends Document {
   static getInitialProps({ renderPage }) {
@@ -43,10 +19,20 @@ export default class MyDocument extends Document {
             name="description"
             content="AddrETH - Claim your address and personalize your own page!"
           />
-          <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+          <link rel="icon" type="image/x-icon" href="../static/favicon.ico" />
           <link
             href="https://fonts.googleapis.com/css?family=Roboto+Mono:100,400,700"
             rel="stylesheet"
+          />
+          <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css"
+          />
+          <link
+            rel="stylesheet"
+            type="text/css"
+            href="../static/assets/styles.css"
           />
           {this.props.styleTags}
         </Head>

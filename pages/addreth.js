@@ -375,14 +375,18 @@ export default class Addreth extends Component {
                     <p>{ensDomain}</p>
                   </>
                 )}
-                <Button
-                  light
-                  onClick={() => {
-                    Router.push(`/address/${account}`);
-                  }}
-                >
-                  Go to my addreth
-                </Button>
+                {address !== account &&
+                  (
+                    <Button
+                      light
+                      onClick={() => {
+                        Router.push(`/address/${account}`);
+                      }}
+                    >
+                      Go to my addreth
+                    </Button>
+                  )
+                }
               </Navbar>
               <Container>
                 <div>

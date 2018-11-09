@@ -152,7 +152,16 @@ export default class Leaderboard extends PureComponent {
       const TxsList = this.state.txs.map(tx => (
         <React.Fragment key={tx.from}>
           <LeaderboardSpannet>{tx.rank}</LeaderboardSpannet>
-          <LeaderboardSpannet>{tx.from}</LeaderboardSpannet>
+          <LeaderboardSpannet>
+            <a
+              href="#"
+              onClick={() => {
+                Router.push(`/address/${tx.from}`);
+              }}
+            >
+              {tx.from}
+            </a>
+          </LeaderboardSpannet>
           <LeaderboardSpannet>{tx.value} ETH</LeaderboardSpannet>
           <LeaderboardSpannet>
             <Emojify>{tx.input}</Emojify>

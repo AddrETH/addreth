@@ -71,8 +71,8 @@ export default class DonationForm extends PureComponent {
           (err, hash) => {
             //debugger;
             console.log('tx hash', hash)
-            form.elements['message'].value = ''
-            form.elements['amount'].value = ''
+            // form.elements['message'].value = ''
+            // form.elements['amount'].value = ''
             this.setState({
               thanks: true,
               donateEnabled: true,

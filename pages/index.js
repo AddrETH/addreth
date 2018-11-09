@@ -134,7 +134,7 @@ const TextBlock = styled.div`
   display: block;
 `
 
-const TextBlockCenter = styled.p`
+const TextBlockCenter = styled.div`
   display: block;
   text-align: center;
   padding-top: 1.5rem;

@@ -51,7 +51,7 @@ const LeaderboardContainer = styled.div`
 const AddrethLink = styled.a`
   word-wrap: wrap;
   color: #03dac6;
-  font-weight: 100;
+  font-weight: 500;
   font-size: 1.5rem;
   text-decoration: none;
   justify-self: center;
@@ -318,7 +318,7 @@ export default class Addreth extends Component {
       return (
         <Container>
           <AddrethLink
-            href={`https://blockscout.com/eth/ropsten/address/${address}`}
+            href={`https://etherscan.io/address/${address}`}
             target="_blank"
           >
             {address}

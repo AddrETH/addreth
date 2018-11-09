@@ -73,13 +73,8 @@ export default class Leaderboard extends PureComponent {
   }
 
   fetchTxs = async address => {
-    const bs = `https://ipfs.web3.party:5001/corsproxy?module=account&action=txlist&address=${address}`
-    const json = await axios.get(bs, {
-      headers: {
-        Authorization: '',
-        'Target-URL': 'https://blockscout.com/eth/ropsten/api',
-      },
-    })
+    const bs = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}`
+    const json = await axios.get(bs)
     return this.processTxList(json.data.result)
   }
 
@@ -99,7 +94,7 @@ export default class Leaderboard extends PureComponent {
           // tx was not successful - skip it.
           return acc
         }
-        if (cur.from == this.props.address) {
+        if (cur.from === this.props.address) {
           // tx was outgoing - don't add it in
           return acc
         }
@@ -161,10 +156,9 @@ export default class Leaderboard extends PureComponent {
             {tx.hash.map((hash, index) => (
               <TxLink
                 key={hash}
-                href={`https://blockscout.com/eth/ropsten/tx/${hash}`}
+                href={`https://etherscan.io/eth/ropsten/tx/${hash}`}
                 target="_blank"
               >
-                {/* [{index + 1}] */}
                 <FaBolt />
               </TxLink>
             ))}

@@ -61,13 +61,6 @@ const AddrethLink = styled.a`
   padding: 2rem;
 `
 
-const Wrapper = styled.div`
-  padding: 0 2rem;
-  min-height: 100vh;
-  background: linear-gradient(180deg, #6200ee 0%, rgba(98, 0, 238, 0.49) 100%),
-    #c4c4c4;
-`
-
 const Navbar = styled.div`
   height: 4rem;
   color: white;
@@ -325,9 +318,9 @@ export default class Addreth extends Component {
           </AddrethLink>
           <QRCode
             className={`${qrCodeStyle}`}
-            renderAs={`svg`}
-            fgColor={`#2d0072`}
-            bgColor={`#89e5ff00`}
+            renderAs="svg"
+            fgColor="#2d0072"
+            bgColor="#89e5ff00"
             value={this.props.addreth}
           />
 

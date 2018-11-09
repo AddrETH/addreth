@@ -41,7 +41,7 @@ const Thanks = styled.span`
 `
 
 export default class DonationForm extends PureComponent {
-  constructor(props) {
+  constructor() {
     super()
     this.state = {
       netId: 0,

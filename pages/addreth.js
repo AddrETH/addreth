@@ -362,8 +362,10 @@ export default class Addreth extends Component {
                     <p>{ensDomain}</p>
                   </>
                 )}
-                {address !== account &&
-                  (
+                {account
+                  && address
+                  && address.toLowerCase() !== account.toLowerCase()
+                  && (
                     <Button
                       light
                       onClick={() => {

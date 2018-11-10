@@ -150,9 +150,10 @@ export default class Leaderboard extends PureComponent {
           <LeaderboardSpannet>{tx.rank}</LeaderboardSpannet>
           <LeaderboardSpannet>
             <TxLink
-              href=""
+              key={tx.from}
+              href={`/address/${tx.from}`}
               onClick={() => {
-                Router.push(`/address/${tx.from}`);
+                Router.push(`/address/${tx.from}`)
               }}
             >
               {tx.from}
@@ -166,7 +167,7 @@ export default class Leaderboard extends PureComponent {
             {tx.hash.map((hash, index) => (
               <TxLink
                 key={hash}
-                href={`https://etherscan.io/eth/ropsten/tx/${hash}`}
+                href={`https://etherscan.io/tx/${hash}`}
                 target="_blank"
               >
                 <FaBolt />

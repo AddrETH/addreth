@@ -241,9 +241,9 @@ class App extends Component {
             </TextBlock>
             <TextBlock>
               With AddrETH it is easy to mark an address for a specific purpose
-              - for this we plan to use modules. Our first module is the
-              beloved:
+              - for this we plan to use modules.
             </TextBlock>
+            <TextBlock>Our first module is the beloved:</TextBlock>
             <SubHeadline>Donation Leaderboard</SubHeadline>
           </Content>
           <Footer>

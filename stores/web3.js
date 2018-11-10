@@ -36,6 +36,12 @@ export const initMetaMask = () => {
           alert("You've locked your MetaMask")
         }
 
+        window.web3.version.getNetwork(
+          (err, network) =>
+            network !== '1' &&
+            alert('Please switch MetaMask network to Mainnet')
+        )
+
         web3.currentProvider.publicConfigStore.on('update', res => {
           Web3Store.set(() => ({
             isAvailable: true,
@@ -64,6 +70,10 @@ export const initMetaMask = () => {
       } else {
         alert("You've locked your MetaMask")
       }
+
+      window.web3.version.getNetwork((err, network) => {
+        network !== '1' && alert('Please switch MetaMask network to Mainnet')
+      })
 
       web3.currentProvider.publicConfigStore.on('update', res => {
         Web3Store.set(() => ({

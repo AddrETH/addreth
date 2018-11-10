@@ -41,7 +41,7 @@ const Thanks = styled.span`
 `
 
 export default class DonationForm extends PureComponent {
-  constructor(props) {
+  constructor() {
     super()
     this.state = {
       netId: 0,
@@ -95,7 +95,6 @@ export default class DonationForm extends PureComponent {
     const candonate = true
     return (
       <Container>
-        {/* <img src="/img/ways-to-donate.svg" className="typelogo img-fluid" /> */}
         {candonate ? (
           <TransactionContainer>
             <TransactionForm onSubmit={this.handleDonate}>
@@ -107,7 +106,6 @@ export default class DonationForm extends PureComponent {
         ) : (
           <br />
         )}
-        {/* <img src="/img/placeholder-qr.svg" className="qr-code" /> */}
         {this.state.thanks && <div>WELL THANKS BUDDY</div>}
       </Container>
     )

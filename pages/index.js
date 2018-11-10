@@ -32,7 +32,7 @@ const Background = styled.div`
     rgba(254, 164, 107, 1) 40%,
     rgba(252, 10, 146, 1) 100%
   );
-  background: url('static/images/bg.jpeg') no-repeat;
+  background: url('/static/images/bg.jpeg') no-repeat;
   background-size: cover;
   min-height: 120vh;
   max-width: 100vw;

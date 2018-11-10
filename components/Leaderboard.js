@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import Emojify from 'react-emojione'
 import axios from 'axios'
 import { FaBolt } from 'react-icons/fa'
+import { Router } from '../routes'
 
 import { Web3Store } from '../stores/web3'
 
@@ -147,7 +148,16 @@ export default class Leaderboard extends PureComponent {
       const TxsList = this.state.txs.map(tx => (
         <React.Fragment key={tx.from}>
           <LeaderboardSpannet>{tx.rank}</LeaderboardSpannet>
-          <LeaderboardSpannet>{tx.from}</LeaderboardSpannet>
+          <LeaderboardSpannet>
+            <TxLink
+              href=""
+              onClick={() => {
+                Router.push(`/address/${tx.from}`);
+              }}
+            >
+              {tx.from}
+            </TxLink>
+          </LeaderboardSpannet>
           <LeaderboardSpannet>{tx.value} ETH</LeaderboardSpannet>
           <LeaderboardSpannet>
             <Emojify>{tx.input}</Emojify>

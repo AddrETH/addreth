@@ -149,13 +149,14 @@ export default class Leaderboard extends PureComponent {
         <React.Fragment key={tx.from}>
           <LeaderboardSpannet>{tx.rank}</LeaderboardSpannet>
           <LeaderboardSpannet>
-            <a href="#"
+            <TxLink
+              href=""
               onClick={() => {
                 Router.push(`/address/${tx.from}`);
               }}
             >
               {tx.from}
-            </a>
+            </TxLink>
           </LeaderboardSpannet>
           <LeaderboardSpannet>{tx.value} ETH</LeaderboardSpannet>
           <LeaderboardSpannet>

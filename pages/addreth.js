@@ -362,20 +362,18 @@ export default class Addreth extends Component {
                     <p>{ensDomain}</p>
                   </>
                 )}
-                {account
-                  && address
-                  && address.toLowerCase() !== account.toLowerCase()
-                  && (
+                {account &&
+                  address &&
+                  address.toLowerCase() !== account.toLowerCase() && (
                     <Button
                       light
                       onClick={() => {
-                        Router.push(`/address/${account}`);
+                        Router.push(`/address/${account}`)
                       }}
                     >
                       Go to my addreth
                     </Button>
-                  )
-                }
+                  )}
               </Navbar>
               <Container>
                 <div>
@@ -396,16 +394,12 @@ export default class Addreth extends Component {
                         <Title
                           type="text"
                           placeholder="Enter your title!"
-                          value={titleValue ||
-                            (ipfsPayload && ipfsPayload.title)}
                           onChange={e =>
                             this.setState({ titleValue: e.target.value })
                           }
                         />
                         <Description
                           placeholder="Enter your description!"
-                          value={descriptionValue ||
-                            (ipfsPayload && ipfsPayload.description)}
                           onChange={e =>
                             this.setState({ descriptionValue: e.target.value })
                           }

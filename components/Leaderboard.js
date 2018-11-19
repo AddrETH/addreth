@@ -6,6 +6,7 @@ import { FaBolt } from 'react-icons/fa'
 import { Router } from '../routes'
 
 import { Web3Store } from '../stores/web3'
+import MakerUsdPrice from './MakerDaoUsd'
 
 const LeaderboardContainer = styled.div`
   display: grid;
@@ -62,7 +63,7 @@ const AmountDonated = props => {
   return (
     <Total>
       Total amount collected
-      <Amount>{props.amount} ETH</Amount>
+      <Amount>{props.amount} ETH <MakerUsdPrice amount={props.amount} /></Amount>
     </Total>
   )
 }

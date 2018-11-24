@@ -132,6 +132,7 @@ const TextHeadline = styled.h1``
 
 const TextBlock = styled.div`
   display: block;
+  padding: 1rem;
 `
 
 const TextBlockCenter = styled.div`
@@ -236,9 +237,10 @@ class App extends Component {
             </TextBlockCenter>
             <TextHeadline>Welcome to AddrETH!</TextHeadline>
             <TextBlock>
-              We provide a service that lets you put content to your MetaMask
-              enabled Ethereum address, as well as browse the content of others.
+              Log in with MetaMask and put content to your Ethereum address, as
+              well as browse the content of others that have done so.
             </TextBlock>
+            <TextBlock>We 💝 ENS</TextBlock>
             <TextBlock>
               With AddrETH it is easy to mark an address for a specific purpose
               - for this we plan to use modules.

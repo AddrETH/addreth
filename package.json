@@ -9,27 +9,27 @@
   },
   "dependencies": {
     "abi-decoder": "^1.2.0",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "domain-name-parser": "^2.3.0",
     "ethjs-ens": "^2.0.1",
     "ethjs-provider-http": "^0.1.6",
-    "express": "^4.16.3",
+    "express": "^4.17.1",
     "glamor": "^2.20.40",
-    "ipfs-mini": "^1.1.2",
-    "laco": "^1.2.0",
-    "laco-react": "^1.0.0",
-    "is-ipfs": "^0.4.7",
-    "next": "^7.0.1",
+    "ipfs-mini": "^1.1.5",
+    "is-ipfs": "^0.4.8",
+    "laco": "^1.2.1",
+    "laco-react": "^1.1.0",
+    "next": "^7.0.3",
     "next-routes": "^1.4.2",
     "qrcode.react": "^0.8.0",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-emojione": "^5.0.0",
-    "react-icons": "^3.2.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-emojione": "^5.0.1",
+    "react-icons": "^3.7.0",
     "styled-components": "^3.2.5",
-    "web3": "^1.0.0-beta.36"
+    "web3": "^1.0.0-beta.55"
   },
   "devDependencies": {
-    "babel-plugin-styled-components": "^1.5.1"
+    "babel-plugin-styled-components": "^1.10.6"
   }
 }

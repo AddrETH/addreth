@@ -394,12 +394,14 @@ export default class Addreth extends Component {
                         <Title
                           type="text"
                           placeholder="Enter your title!"
+                          value={titleValue}
                           onChange={e =>
                             this.setState({ titleValue: e.target.value })
                           }
                         />
                         <Description
                           placeholder="Enter your description!"
+                          value={descriptionValue}
                           onChange={e =>
                             this.setState({ descriptionValue: e.target.value })
                           }
